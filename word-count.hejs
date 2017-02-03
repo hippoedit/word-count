@@ -1,0 +1,38 @@
+AddScriptInfo("7F0619CA-31FF-4C52-BF3E-206360731F77", "Word Count", "1.0.0.3", "Word Count Status Bar Indicator", "HippoEDIT.com", "supportbox@hippoedit.com", "http://wiki.hippoedit.com/plugins/word-count");
+
+function countWords()
+{
+	if ( !ActiveView ) return 0;
+
+	var sel = ActiveView.Selection;
+
+	// if there is no selection, take current word range as selection
+	if ( sel.IsEmpty )
+		sel = new Range(0, 0, ActiveDocument.LineCount - 1, ActiveDocument.GetLineLength(ActiveDocument.LineCount - 1));
+	
+	var results = ActiveDocument.FindAll("\\S+", 4 /*eFindRegexp*/, sel); 
+	return results?results.length:0;	
+} 
+
+function onClick()
+{
+	if ( ActiveView.Selection.IsEmpty ) status("Document has " + countWords() + " words", eMessageTypeInfo);
+	else  status("Selection has " + countWords() + " words", eMessageTypeInfo);
+}
+
+var vWordCountIndicator = new Command("WordCount.Indicator", "Calculate", "Word Count", -1, onClick);
+vWordCountIndicator.onTitle = function (){	
+	return (!ActiveDocument || ActiveDocument.Size > 50000)?'?':(this.words = countWords());	
+}
+ 
+vWordCountIndicator.onBackColor = function () {
+ 	if ( this.words > 320 ) return 0xA00000FF;
+	if ( this.words > 160 ) return 0xA000FFFF;
+	return 0xFF000000;
+}
+
+////////////////////////////////////////////////////////////////////////
+// Test Status Bar handlers
+Application.onInitStatusBar = function () {	
+	this.InsertIndicator(1, vWordCountIndicator, 50);
+}
