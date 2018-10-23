@@ -1,8 +1,12 @@
 AddScriptInfo("7F0619CA-31FF-4C52-BF3E-206360731F77", "Word Count", "1.0.0.3", "Word Count Status Bar Indicator", "HippoEDIT.com", "supportbox@hippoedit.com", "http://wiki.hippoedit.com/plugins/word-count");
 
-function countWords()
-{
-	if ( !ActiveView ) return 0;
+function IsTextDocument() {
+	return ActiveDocument != null && (ActiveDocument.Type === undefined || ActiveDocument.Type === "HE::TEXTDOCUMENT");   
+}
+
+function countWords() {     
+	if ( !IsTextDocument() ) 
+		return 0;
 
 	var sel = ActiveView.Selection;
 
@@ -14,8 +18,7 @@ function countWords()
 	return results?results.length:0;	
 } 
 
-function onClick()
-{
+function onClick() {
 	if ( ActiveView.Selection.IsEmpty ) status("Document has " + countWords() + " words", eMessageTypeInfo);
 	else  status("Selection has " + countWords() + " words", eMessageTypeInfo);
 }
@@ -26,9 +29,9 @@ vWordCountIndicator.onTitle = function (){
 }
  
 vWordCountIndicator.onBackColor = function () {
- 	if ( this.words > 320 ) return 0xA00000FF;
-	if ( this.words > 160 ) return 0xA000FFFF;
-	return 0xFF000000;
+	if ( this.words > 320 ) return parseInt(0x0A0000FF);
+	if ( this.words > 160 ) return parseInt(0x0A00FFFF);
+	return parseInt(0xFFFFFFFF); 
 }
 
 ////////////////////////////////////////////////////////////////////////
